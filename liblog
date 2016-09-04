@@ -1,0 +1,112 @@
+# liblog - A Bash library for basic log handling
+# Copyright (C) 2016  David Moreno
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+[[ -z $__liblog_version__ ]] && {
+__liblog_version__="1.0"
+
+__log_dir__="/var/log"
+__log_name__=
+__log_sep__=":"
+
+function log_get_name {
+	echo $__log_name__
+}
+
+function log_set_name {
+	__log_name__=$1
+}
+
+function log_get_dir {
+	echo $__log_dir__
+}
+
+function log_set_dir {
+	__log_dir__=$1
+}
+
+function log_get_sep {
+	echo $__log_sep__
+}
+
+function log_set_sep {
+	__log_sep__=$1
+}
+
+function log_create {
+	mkdir -p "$__log_dir__"
+	[[ ! -d "$__log_dir__" ]] && return
+	[[ -z "$__log_name__" ]] && return
+	echo -n "" > "$__log_dir__/$__log_name__"
+}
+
+function log_check {
+	[[ ! -d "$__log_dir__" ]] && { echo 0; return; }
+	[[ -z "$__log_name__" ]] && { echo 0; return; }
+	[[ ! -w "$__log_name__" ]] && { echo 0; return; }
+	echo 1
+}
+
+function log_clear {
+	(( ! `log_check` )) && return
+	echo -n "" > "$__log_dir__/$__log_name__"
+}
+
+function log_delete {
+	(( ! `log_check` )) && return
+	rm -f "$__log_dir__/$__log_name__"
+}
+
+function log_write {
+	(( ! `log_check` )) && return
+	echo `date "+%b %_d %H:%M:%S "` "$1" >> "$__log_dir__/$__log_name__"
+}
+
+function log_write_debug {
+	(( ! `log_check` )) && return
+	log_write "DEBUG$__log_sep__ $1"
+}
+
+function log_write_info {
+	(( ! `log_check` )) && return
+	log_write "INFO$__log_sep__ $1"
+}
+
+function log_write_notice {
+	(( ! `log_check` )) && return
+	log_write "NOTICE$__log_sep__ $1"
+}
+
+function log_write_warning {
+	(( ! `log_check` )) && return
+	log_write "WARNING$__log_sep__ $1"
+}
+
+function log_write_error {
+	(( ! `log_check` )) && return
+	log_write "ERROR$__log_sep__ $1"
+}
+
+function log_write_critical {
+	(( ! `log_check` )) && return
+	log_write "CRITICAL$__log_sep__ $1"
+}
+
+function log_get_last {
+	(( ! `log_check` )) && return
+	echo `tail -n1 $__log_dir__/$__log_name__`
+}
+
+} #Guard end.
