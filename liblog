@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 [[ -z $__liblog_version__ ]] && {
-__liblog_version__="1.0"
+__liblog_version__="1.0.1"
 
 __log_dir__="/var/log"
 __log_name__=
@@ -55,7 +55,7 @@ function log_create {
 function log_check {
 	[[ ! -d "$__log_dir__" ]] && { echo 0; return; }
 	[[ -z "$__log_name__" ]] && { echo 0; return; }
-	[[ ! -w "$__log_name__" ]] && { echo 0; return; }
+	[[ ! -w "$__log_dir__/$__log_name__" ]] && { echo 0; return; }
 	echo 1
 }
 
